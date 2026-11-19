@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Leonida Cover Studio — GTA 6-style cover art maker</title>
+<meta name="description" content="Turn any photo and caption into GTA 6-style multi-panel cover art, offline in your browser, exported as PNG.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-badge">VI</span>
+    <div>
+      <h1>LEONIDA COVER STUDIO</h1>
+      <p>Photo + caption &rarr; GTA-style cover art &middot; 100% offline, photos never leave this machine</p>
+    </div>
+  </div>
+  <div class="top-actions">
+    <button id="btn-sample" class="btn ghost" type="button">Load sample photo</button>
+    <button id="btn-export" class="btn primary" type="button">Export PNG</button>
+  </div>
+</header>
+
+<main class="studio">
+  <section class="preview-pane">
+    <div class="canvas-wrap">
+      <canvas id="stage" width="1080" height="1080" aria-label="Cover art preview"></canvas>
+      <div id="drop-hint" class="drop-hint">Drop a photo anywhere to load it</div>
+    </div>
+    <div class="preview-bar">
+      <span id="size-label">1080 &times; 1080 &middot; Square post</span>
+      <label class="zoom">Preview
+        <input id="preview-zoom" type="range" min="30" max="100" value="62">
+      </label>
+    </div>
+  </section>
+
+  <aside class="controls">
+    <section class="panel">
+      <h2>1 &middot; Photos</h2>
+      <div class="file-row">
+        <label class="btn file-btn">Add photo(s)
+          <input id="file-input" type="file" accept="image/*" multiple hidden>
+        </label>
+        <button id="btn-clear-photos" class="btn ghost small" type="button">Clear</button>
+      </div>
+      <p class="hint">Up to 4 photos. Click a thumb to put it in the active panel, or drag it onto a panel.</p>
+      <div id="thumbs" class="thumbs"></div>
+      <div class="field">
+        <label for="active-panel">Active panel</label>
+        <select id="active-panel">
+          <option value="0">Panel 1 &mdash; hero</option>
+          <option value="1">Panel 2</option>
+          <option value="2">Panel 3</option>
+          <option value="3">Panel 4</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="zoom">Zoom <span id="zoom-val">100%</span></label>
+        <input id="zoom" type="range" min="50" max="300" value="100">
+      </div>
+      <div class="field">
+        <label for="panx">Position X <span id="panx-val">0</span></label>
+        <input id="panx" type="range" min="-100" max="100" value="0">
+      </div>
+      <div class="field">
+        <label for="pany">Position Y <span id="pany-val">0</span></label>
+        <input id="pany" type="range" min="-100" max="100" value="0">
+      </div>
+      <div class="field row">
+        <button id="btn-flip" class="btn ghost small" type="button">Flip photo</button>
+        <button id="btn-fit" class="btn ghost small" type="button">Fit whole photo</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>2 &middot; Layout &amp; grade</h2>
+      <div class="field">
+        <label>Layout</label>
+        <div class="seg" id="layout-seg">
+          <button type="button" data-layout="collage" class="on">Collage</button>
+          <button type="button" data-layout="hero">Hero</button>
+          <button type="button" data-layout="duo">Duo</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Colour grade</label>
+        <div class="seg" id="grade-seg">
+          <button type="button" data-grade="sunset" class="on">Sunset</button>
+          <button type="button" data-grade="neon">Neon</button>
+          <button type="button" data-grade="noir">Noir</button>
+          <button type="button" data-grade="vice">Vice</button>
+        </div>
+      </div>
+      <div class="field">
+        <label for="posterize">Posterize <span id="posterize-val">5 levels</span></label>
+        <input id="posterize" type="range" min="2" max="8" step="1" value="5">
+      </div>
+      <div class="field check">
+        <label><input id="print-dots" type="checkbox" checked> Print dots (halftone)</label>
+        <label><input id="grain" type="checkbox" checked> Film grain</label>
+        <label><input id="panel-borders" type="checkbox" checked> Comic panel borders</label>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>3 &middot; Caption</h2>
+      <div class="field">
+        <label for="title">Title</label>
+        <input id="title" type="text" value="LEONIDA" maxlength="24">
+      </div>
+      <div class="field">
+        <label for="subtitle">Subtitle</label>
+        <input id="subtitle" type="text" value="VICE CITY" maxlength="40">
+      </div>
+      <div class="field">
+        <label for="tagline">Tagline</label>
+        <input id="tagline" type="text" value="EVERY SUNSET HAS A PRICE" maxlength="60">
+      </div>
+      <div class="field">
+        <label for="badge">Badge</label>
+        <input id="badge" type="text" value="VI" maxlength="6">
+      </div>
+      <div class="field">
+        <label for="title-color">Title style</label>
+        <select id="title-color">
+          <option value="sunset">Sunset gradient</option>
+          <option value="white">White on black</option>
+          <option value="neon">Neon pink</option>
+          <option value="gold">Gold</option>
+        </select>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>4 &middot; Export</h2>
+      <div class="field">
+        <label>Post size</label>
+        <div class="seg wrap" id="size-seg">
+          <button type="button" data-size="1080x1080" class="on">1080&times;1080</button>
+          <button type="button" data-size="1080x1350">1080&times;1350</button>
+          <button type="button" data-size="1920x1080">1920&times;1080</button>
+          <button type="button" data-size="1080x1920">1080&times;1920</button>
+        </div>
+      </div>
+      <button id="btn-export-2" class="btn primary block" type="button">Download PNG</button>
+      <p class="hint">One click, photo to PNG. File name: <code>leonida-cover-1080x1080.png</code> (matches the size you pick).</p>
+      <p class="hint" id="status" role="status">Ready. Load a photo or try the sample.</p>
+    </section>
+
+    <p class="fineprint">Fan-made cover art in the style of GTA 6 posters. Not affiliated with, endorsed by or sponsored by Rockstar Games or Take-Two Interactive. No Rockstar logo, artwork or fonts are used. All art, lettering and code here are original.</p>
+  </aside>
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
